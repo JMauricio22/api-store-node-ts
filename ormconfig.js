@@ -1,10 +1,17 @@
+const parse = require('pg-connection-string').parse;
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const postgresConfig = parse(process.env.DATABASE_URL);
+
 module.exports = {
   type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'mau',
-  password: 'admin123',
-  database: 'my_store',
+  host: postgresConfig.host,
+  port: postgresConfig.port,
+  username: postgresConfig.user,
+  password: postgresConfig.password,
+  database: postgresConfig.database,
   synchronize: true,
   logging: true,
   entities: ['src/entities/**/*.ts'],
