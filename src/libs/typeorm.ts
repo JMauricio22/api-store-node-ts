@@ -3,7 +3,7 @@ import config from '../config/config';
 
 export async function connect() {
   try {
-    await createConnection({
+    const options: any = {
       type: 'postgres',
       url: config.DATABASE_URL,
       entities: ['src/entities/**/*.ts'],
@@ -12,7 +12,17 @@ export async function connect() {
         migrationsDir: 'src/migrations',
         entitiesDir: 'src/entities',
       },
-    });
+    };
+
+    if (config.NODE_ENV === 'production') {
+      options.extra = {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      };
+    }
+
+    await createConnection(options);
     console.log('Connection successfully');
   } catch (error) {
     console.log(error);
