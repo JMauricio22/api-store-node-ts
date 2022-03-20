@@ -4,6 +4,19 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const postgresConfig = parse(process.env.DATABASE_URL);
+let extraConfig;
+
+if (process.env.NODE_ENV === 'development') {
+  extraConfig = {};
+} else {
+  extraConfig = {
+    extra: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
+  };
+}
 
 module.exports = {
   type: 'postgres',
@@ -20,9 +33,5 @@ module.exports = {
     migrationsDir: 'src/migrations',
     entitiesDir: 'src/entities',
   },
-  extra: {
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  },
+  ...extraConfig,
 };
