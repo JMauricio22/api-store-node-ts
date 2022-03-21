@@ -6,12 +6,13 @@ import {
   getUserSchema,
   updateUserSchema,
 } from '../schemas/user.schema';
+import { isAuthenticated } from '../middlewares/auth.handler';
 
 const userService = new UserService();
 
 const router = Router();
 
-router.get('/', async (req, res, next) => {
+router.get('/', isAuthenticated, async (req, res, next) => {
   try {
     const tasks = await userService.find();
     return res.json({ data: tasks });

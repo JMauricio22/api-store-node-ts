@@ -1,6 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  BeforeInsert,
+} from 'typeorm';
 import { IsEmail, Length } from 'class-validator';
 import { Customer } from './Customer';
+import bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -20,8 +27,16 @@ export class User {
 
   @Column()
   @Length(8)
-  password!: string;
+  password?: string;
 
   @OneToOne(() => Customer, (customer) => customer.user)
   profile!: Customer;
+
+  @BeforeInsert()
+  async hashPassword() {
+    if (this.password) {
+      const hash = await bcrypt.hash(this.password, 10);
+      this.password = hash;
+    }
+  }
 }

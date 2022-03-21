@@ -9,6 +9,7 @@ import {
 } from './middlewares/error.handler';
 import { connect } from './libs/typeorm';
 import 'reflect-metadata';
+import './utils/auth/';
 
 connect();
 
