@@ -15,7 +15,7 @@ class CustomerService {
   }
 
   async create(body: CreateCustomer) {
-    const user = new User(body.user.email, body.user.password);
+    const user = new User(body.user.email, body.user.password, body.user.role);
     const customer = new Customer(
       body.firstName,
       body.lastName,

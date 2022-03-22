@@ -14,7 +14,7 @@ class UserService {
   }
 
   async create(body: CreateUser) {
-    const user = new User(body.email, body.password);
+    const user = new User(body.email, body.password, body.role);
     await validateOrReject(user);
     const result = await getRepository(User).save(user);
     delete result.password;

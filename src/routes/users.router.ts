@@ -6,23 +6,30 @@ import {
   getUserSchema,
   updateUserSchema,
 } from '../schemas/user.schema';
-import { isAuthenticated } from '../middlewares/auth.handler';
+import passport from 'passport';
+import { checkRoles } from '../middlewares/auth.handler';
 
 const userService = new UserService();
 
 const router = Router();
 
-router.get('/', isAuthenticated, async (req, res, next) => {
-  try {
-    const tasks = await userService.find();
-    return res.json({ data: tasks });
-  } catch (error: any) {
-    next(error);
+router.get(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res, next) => {
+    try {
+      const tasks = await userService.find();
+      return res.json({ data: tasks });
+    } catch (error: any) {
+      next(error);
+    }
   }
-});
+);
 
 router.post(
   '/',
+  passport.authenticate('jwt'),
+  checkRoles('admin'),
   validationHandler(createUserSchema, 'body'),
   async (req, res, next) => {
     try {

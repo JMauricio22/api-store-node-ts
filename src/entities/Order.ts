@@ -35,11 +35,16 @@ export class Order {
 
   @AfterLoad()
   calculateTotal() {
-    if (this.orderItems.length > 0) {
-      const total = this.orderItems.reduce((acc: number, item: OrderItems) => {
-        return acc + item.product.price * item.quantity;
-      }, 0);
-      this.total = Number.parseInt(total.toFixed(2));
+    if (this.orderItems) {
+      if (this.orderItems.length > 0) {
+        const total = this.orderItems.reduce(
+          (acc: number, item: OrderItems) => {
+            return acc + item.product.price * item.quantity;
+          },
+          0
+        );
+        this.total = Number.parseInt(total.toFixed(2));
+      }
     }
   }
 }

@@ -1,11 +1,10 @@
 import express from 'express';
+import passport from 'passport';
 import validationHandler from '../middlewares/validationHandler';
-import {
-  createOrderSchema,
-  getOrderSchema,
-  addItemToOrderSchema,
-} from '../schemas/orders.schema';
+import { getOrderSchema, addItemToOrderSchema } from '../schemas/orders.schema';
 import OrderService from '../services/orders.service';
+import { checkRoles } from '../middlewares/auth.handler';
+import { User } from '../entities/User';
 
 const router = express.Router();
 
@@ -24,11 +23,15 @@ router.get('/', async (req, res, next) => {
 
 router.post(
   '/',
-  validationHandler(createOrderSchema, 'body'),
+  passport.authenticate('jwt'),
+  checkRoles('customer'),
   async (req, res, next) => {
     try {
-      const { body } = req;
-      const order = await orderService.create(body);
+      const { user } = req;
+      console.log(user);
+      const order = await orderService.create({
+        userId: (user as any).sub,
+      });
       res.json({
         data: order,
       });
@@ -40,6 +43,8 @@ router.post(
 
 router.post(
   '/add-item',
+  passport.authenticate('jwt'),
+  checkRoles('customer'),
   validationHandler(addItemToOrderSchema, 'body'),
   async (req, res, next) => {
     try {

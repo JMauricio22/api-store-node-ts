@@ -1,10 +1,13 @@
 import Boom from '@hapi/boom';
+import { Request, Response, NextFunction } from 'express';
+import { User } from '../entities/User';
 
-export function isAuthenticated(req, res, next) {
-  const apiKey = '123';
-  if (req.headers['api'] === apiKey) {
-    next();
-  } else {
-    next(Boom.unauthorized());
-  }
+export function checkRoles(...roles: string[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (roles.includes((req.user as User).role)) {
+      next();
+    } else {
+      next(Boom.forbidden());
+    }
+  };
 }

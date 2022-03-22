@@ -4,20 +4,28 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   BeforeInsert,
+  Check,
 } from 'typeorm';
 import { IsEmail, Length } from 'class-validator';
 import { Customer } from './Customer';
 import bcrypt from 'bcrypt';
 
 @Entity()
+@Check("role in ('admin', 'customer', 'seller')")
 export class User {
-  constructor(email: string, password: string) {
+  constructor(email: string, password: string, role: string) {
     this.email = email;
     this.password = password;
+    this.role = role;
   }
 
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @Column({
+    default: 'customer',
+  })
+  role!: string;
 
   @Column({
     unique: true,

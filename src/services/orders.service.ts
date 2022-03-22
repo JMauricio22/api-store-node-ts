@@ -1,10 +1,10 @@
-import { getConnection, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { Order } from '../entities/Order';
 import { Customer } from '../entities/Customer';
 import { Product } from '../entities/Product';
 import { OrderItems } from '../entities/OrderItems';
 import Boom from '@hapi/boom';
-import { CreateOrder, AddItem } from '../types/order.model';
+import { CreateOrder, AddItem, User } from '../types/order.model';
 import { validateOrReject } from 'class-validator';
 
 class CustomerService {
@@ -30,11 +30,39 @@ class CustomerService {
     return orders;
   }
 
+  async findOrderByUserId(user: User) {
+    const customer = await getRepository(Customer).findOne({
+      where: {
+        user: {
+          id: user.userId,
+        },
+      },
+    });
+    if (!customer) {
+      throw Boom.notFound(`User with id ${user.userId} is not a customer`);
+    }
+    const orders = await getRepository(Order).find({
+      where: {
+        customer: {
+          id: customer.id,
+        },
+      },
+      relations: ['orderItems', 'orderItems.product'],
+    });
+    return orders;
+  }
+
   async create(body: CreateOrder) {
     const order = new Order();
-    const customer = await getRepository(Customer).findOne(body.customerId);
+    const customer = await getRepository(Customer).findOne({
+      where: {
+        user: {
+          id: body.userId,
+        },
+      },
+    });
     if (!customer) {
-      throw Boom.badData(`Customer with id ${body.customerId} does not exist`);
+      throw Boom.badData(`The user with id ${body.userId} is not a customer`);
     }
     order.customer = customer;
     await validateOrReject(order);
