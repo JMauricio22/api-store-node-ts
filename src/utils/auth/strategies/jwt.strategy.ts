@@ -7,6 +7,5 @@ const options: StrategyOptions = {
 };
 
 export default new Strategy(options, (payload, done) => {
-  console.log(payload);
   done(null, payload);
 });

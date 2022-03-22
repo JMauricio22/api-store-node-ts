@@ -3,7 +3,6 @@ import { User } from '../entities/User';
 import Boom from '@hapi/boom';
 import { CreateUser, UpdateUser } from '../types/user.model';
 import { validateOrReject } from 'class-validator';
-import bcrypt from 'bcrypt';
 
 class UserService {
   async find() {
@@ -29,11 +28,8 @@ class UserService {
     return user;
   }
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | undefined> {
     const user = await getRepository(User).findOne({ where: { email } });
-    if (!user) {
-      throw Boom.notFound();
-    }
     return user;
   }
 
@@ -42,8 +38,8 @@ class UserService {
     Object.keys(body).forEach((key: string) => {
       user[key] = body[key];
     });
-    await validateOrReject(user);
-    const result = await getRepository(User).save(user as User);
+    console.log(user);
+    const result = await getRepository(User).save(user);
     return result;
   }
 

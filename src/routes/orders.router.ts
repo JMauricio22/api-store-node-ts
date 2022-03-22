@@ -28,7 +28,6 @@ router.post(
   async (req, res, next) => {
     try {
       const { user } = req;
-      console.log(user);
       const order = await orderService.create({
         userId: (user as any).sub,
       });
